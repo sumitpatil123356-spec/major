@@ -1,6 +1,12 @@
 -- SUPABASE SCHEMA FOR RESHELF
 -- Run this in your Supabase project's SQL Editor
 
+-- OPTIONAL: If you want a clean reset and to delete old tables, uncomment the following 4 lines:
+-- drop trigger if exists on_auth_user_created on auth.users;
+-- drop function if exists public.handle_new_user() cascade;
+-- drop table if exists public.products;
+-- drop table if exists public.profiles;
+
 -- 1. Create profiles table (extends auth.users)
 create table if not exists public.profiles (
   id uuid references auth.users(id) on delete cascade primary key,

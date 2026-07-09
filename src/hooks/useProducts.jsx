@@ -90,16 +90,15 @@ export function useProducts() {
     if (!user) throw new Error("Unauthenticated user.");
 
     if (isSupabaseConfigured) {
-      const dbPayload = mapToDb({
-        ...productData,
-        owner: user.full_name,
-      }, user.id);
+      const dbPayload = mapToDb(
+        {
+          ...productData,
+          owner: user.full_name,
+        },
+        user.id,
+      );
 
-      const { data, error } = await supabase
-        .from("products")
-        .insert([dbPayload])
-        .select()
-        .single();
+      const { data, error } = await supabase.from("products").insert([dbPayload]).select().single();
 
       if (error) throw error;
       const newProd = mapFromDb(data);
@@ -165,7 +164,7 @@ export function useProducts() {
       });
       localStorage.setItem("reshelf_local_products", JSON.stringify(updated));
       setProducts(updated);
-      return updated.find(x => x.id === id);
+      return updated.find((x) => x.id === id);
     }
   };
 
@@ -174,10 +173,7 @@ export function useProducts() {
     if (!user) throw new Error("Unauthenticated user.");
 
     if (isSupabaseConfigured) {
-      const { error } = await supabase
-        .from("products")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("products").delete().eq("id", id);
 
       if (error) throw error;
       setProducts((prev) => prev.filter((p) => p.id !== id));

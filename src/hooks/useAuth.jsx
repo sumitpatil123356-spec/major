@@ -22,7 +22,9 @@ export function AuthProvider({ children }) {
       // 1. Setup real Supabase Auth
       const getSessionAndProfile = async () => {
         try {
-          const { data: { session } } = await supabase.auth.getSession();
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
           if (session) {
             const { data: profile } = await supabase
               .from("profiles")
@@ -50,29 +52,29 @@ export function AuthProvider({ children }) {
 
       getSessionAndProfile();
 
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, session) => {
-          if (session) {
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("*")
-              .eq("id", session.user.id)
-              .single();
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (session) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
 
-            setUser({
-              id: session.user.id,
-              email: session.user.email,
-              full_name: profile?.full_name || session.user.user_metadata?.full_name || "New User",
-              phone: profile?.phone || "",
-              city: profile?.city || "Bengaluru",
-              role: "Household",
-            });
-          } else {
-            setUser(null);
-          }
-          setLoading(false);
+          setUser({
+            id: session.user.id,
+            email: session.user.email,
+            full_name: profile?.full_name || session.user.user_metadata?.full_name || "New User",
+            phone: profile?.phone || "",
+            city: profile?.city || "Bengaluru",
+            role: "Household",
+          });
+        } else {
+          setUser(null);
         }
-      );
+        setLoading(false);
+      });
 
       return () => {
         subscription.unsubscribe();
@@ -104,7 +106,7 @@ export function AuthProvider({ children }) {
       // Mock Sign In
       const usersStr = localStorage.getItem("reshelf_mock_users") || "[]";
       const users = JSON.parse(usersStr);
-      
+
       // Seed default user if none exist
       if (users.length === 0) {
         users.push({
@@ -117,7 +119,7 @@ export function AuthProvider({ children }) {
         localStorage.setItem("reshelf_mock_users", JSON.stringify(users));
       }
 
-      const match = users.find(u => u.email === email && u.password === password);
+      const match = users.find((u) => u.email === email && u.password === password);
       if (!match) {
         throw new Error("Invalid email or password. Use aisha@example.com / demo1234 or sign up.");
       }
@@ -170,7 +172,7 @@ export function AuthProvider({ children }) {
             <br/>
             <p>Warmly,</p>
             <p>The ReShelf Team</p>
-          `
+          `,
         });
       } catch (emailErr) {
         console.error("Failed to send welcome email:", emailErr);
@@ -182,7 +184,7 @@ export function AuthProvider({ children }) {
       const usersStr = localStorage.getItem("reshelf_mock_users") || "[]";
       const users = JSON.parse(usersStr);
 
-      if (users.some(u => u.email === email)) {
+      if (users.some((u) => u.email === email)) {
         throw new Error("User already exists with this email.");
       }
 
@@ -202,7 +204,7 @@ export function AuthProvider({ children }) {
         await sendEmailWithResend({
           to: email,
           subject: "Welcome to ReShelf! 🥬",
-          html: `Welcome to ReShelf, ${fullName}!`
+          html: `Welcome to ReShelf, ${fullName}!`,
         });
       } catch (e) {}
 
@@ -239,17 +241,15 @@ export function AuthProvider({ children }) {
     if (!user) throw new Error("No authenticated user.");
 
     if (isSupabaseConfigured) {
-      const { error } = await supabase
-        .from("profiles")
-        .upsert({
-          id: user.id,
-          full_name: updates.full_name,
-          phone: updates.phone,
-          city: updates.city,
-        });
+      const { error } = await supabase.from("profiles").upsert({
+        id: user.id,
+        full_name: updates.full_name,
+        phone: updates.phone,
+        city: updates.city,
+      });
       if (error) throw error;
-      
-      setUser(prev => ({
+
+      setUser((prev) => ({
         ...prev,
         ...updates,
       }));
@@ -260,11 +260,11 @@ export function AuthProvider({ children }) {
         const u = JSON.parse(session);
         const updated = { ...u, ...updates };
         localStorage.setItem("reshelf_session", JSON.stringify(updated));
-        
+
         // Also update in registered list
         const usersStr = localStorage.getItem("reshelf_mock_users") || "[]";
         const users = JSON.parse(usersStr);
-        const idx = users.findIndex(x => x.email === user.email);
+        const idx = users.findIndex((x) => x.email === user.email);
         if (idx !== -1) {
           users[idx] = { ...users[idx], ...updates };
           localStorage.setItem("reshelf_mock_users", JSON.stringify(users));

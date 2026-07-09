@@ -4,20 +4,22 @@ import { z } from "zod";
 const groqApiKey = process.env.GROQ_API_KEY || "";
 
 export const scanProductWithGroq = createServerFn({ method: "POST" })
-  .inputValidator(z.object({
-    imageBase64: z.string(),
-  }))
+  .validator(
+    z.object({
+      imageBase64: z.string(),
+    }),
+  )
   .handler(async ({ data }) => {
     console.log("[Groq Server Function] Invoked. Image data length:", data.imageBase64.length);
 
     if (!groqApiKey || groqApiKey === "gsk_your_groq_api_key_here") {
       console.log("[Groq MOCK MODE] API key is missing. Simulating analysis...");
       // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 15); // 15 days from now
-      
+
       return {
         name: "Fresh Strawberry Jam",
         category: "Food",
@@ -37,27 +39,27 @@ export const scanProductWithGroq = createServerFn({ method: "POST" })
             content: [
               {
                 type: "text",
-                text: "Analyze this image of a product packaging, label, box, or receipt. Extract the product name, its category (must be exactly one of: 'Food', 'Medicine', 'Cosmetics', or 'Household'), quantity (e.g. 500 ml, 1 loaf, 10 tablets, 1 unit), and its estimated or printed expiry date (format: YYYY-MM-DD. If not visible, estimate a reasonable date based on the product type starting from today). Return ONLY a JSON object with keys: 'name', 'category', 'quantity', 'expiryDate', and 'notes'."
+                text: "Analyze this image of a product packaging, label, box, or receipt. Extract the product name, its category (must be exactly one of: 'Food', 'Medicine', 'Cosmetics', or 'Household'), quantity (e.g. 500 ml, 1 loaf, 10 tablets, 1 unit), and its estimated or printed expiry date (format: YYYY-MM-DD. If not visible, estimate a reasonable date based on the product type starting from today). Return ONLY a JSON object with keys: 'name', 'category', 'quantity', 'expiryDate', and 'notes'.",
               },
               {
                 type: "image_url",
                 image_url: {
-                  url: data.imageBase64
-                }
-              }
-            ]
-          }
+                  url: data.imageBase64,
+                },
+              },
+            ],
+          },
         ],
-        response_format: { type: "json_object" }
+        response_format: { type: "json_object" },
       };
 
       const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${groqApiKey}`
+          Authorization: `Bearer ${groqApiKey}`,
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -68,11 +70,13 @@ export const scanProductWithGroq = createServerFn({ method: "POST" })
       const resData = await response.json();
       const content = resData.choices[0]?.message?.content;
       console.log("[Groq Response Content]:", content);
-      
+
       const parsed = JSON.parse(content);
       return {
         name: parsed.name || "Unknown Product",
-        category: ["Food", "Medicine", "Cosmetics", "Household"].includes(parsed.category) ? parsed.category : "Food",
+        category: ["Food", "Medicine", "Cosmetics", "Household"].includes(parsed.category)
+          ? parsed.category
+          : "Food",
         quantity: parsed.quantity || "1 unit",
         expiryDate: parsed.expiryDate || new Date().toISOString().slice(0, 10),
         notes: parsed.notes || "Analyzed by Groq Vision.",
@@ -82,3 +86,10 @@ export const scanProductWithGroq = createServerFn({ method: "POST" })
       throw new Error("Vision scanning failed: " + err.message);
     }
   });
+
+export const getGroqConfigStatus = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const isConfigured = Boolean(groqApiKey) && groqApiKey !== "gsk_your_groq_api_key_here";
+    return { isConfigured };
+  });
+
