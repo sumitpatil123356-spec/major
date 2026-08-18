@@ -188,7 +188,7 @@ export function GroqScanner({ onAdd, onClose }) {
               <Sparkles className="h-4 w-4 text-primary animate-pulse" /> Groq AI Vision Active
             </h4>
             <p className="text-xs text-muted-foreground max-w-xs">
-              Reading product packaging, detecting categories, and predicting expiry dates...
+              Reading bill, receipt, packet, or packaging...
             </p>
           </div>
         </div>
@@ -255,7 +255,7 @@ export function GroqScanner({ onAdd, onClose }) {
               onClick={handleCapture}
               className="w-full brand-gradient text-white hover:opacity-90 font-medium"
             >
-              <Camera className="mr-2 h-4 w-4" /> Capture Product Packaging
+              <Camera className="mr-2 h-4 w-4" /> Capture Bill, Receipt, or Packet
             </Button>
           )}
         </div>
@@ -269,7 +269,7 @@ export function GroqScanner({ onAdd, onClose }) {
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary mb-3">
                 <Upload className="h-6 w-6" />
               </div>
-              <p className="mb-2 text-sm font-semibold">Click to upload product image</p>
+              <p className="mb-2 text-sm font-semibold">Click to upload bill, receipt, or packet image</p>
               <p className="text-xs text-muted-foreground">PNG, JPG, or WEBP (max. 4MB)</p>
             </div>
             <input
@@ -302,7 +302,7 @@ export function GroqScanner({ onAdd, onClose }) {
             onClick={handleScan}
             className="w-full brand-gradient text-white hover:opacity-90 font-medium"
           >
-            <Sparkles className="mr-2 h-4 w-4" /> Scan packaging with Groq AI Vision
+            <Sparkles className="mr-2 h-4 w-4" /> Scan bill, receipt, or packet with Groq AI
           </Button>
         </div>
       )}

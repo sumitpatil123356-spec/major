@@ -32,14 +32,14 @@ export const scanProductWithGroq = createServerFn({ method: "POST" })
     try {
       // Build request body for Groq Vision API
       const payload = {
-        model: "llama-3.2-11b-vision-preview",
+        model: "meta-llama/llama-4-scout-17b-16e-instruct",
         messages: [
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Analyze this image of a product packaging, label, box, or receipt. Extract the product name, its category (must be exactly one of: 'Food', 'Medicine', 'Cosmetics', or 'Household'), quantity (e.g. 500 ml, 1 loaf, 10 tablets, 1 unit), and its estimated or printed expiry date (format: YYYY-MM-DD. If not visible, estimate a reasonable date based on the product type starting from today). Return ONLY a JSON object with keys: 'name', 'category', 'quantity', 'expiryDate', and 'notes'.",
+                text: "Analyze this image of a bill, receipt, packet, or product packaging. Extract the product name (if multiple, pick the main one), its category (must be exactly one of: 'Food', 'Medicine', 'Cosmetics', or 'Household'), quantity (e.g. 500 ml, 1 loaf, 10 tablets, 1 unit), and its estimated or printed expiry date (format: YYYY-MM-DD. If not visible, estimate a reasonable date based on the product type starting from today). Return ONLY a JSON object with keys: 'name', 'category', 'quantity', 'expiryDate', and 'notes'.",
               },
               {
                 type: "image_url",

@@ -140,6 +140,48 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const signInWithGoogle = async () => {
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
+      if (error) throw error;
+      return data;
+    } else {
+      // Mock Google Sign In
+      const email = "google_user@example.com";
+      const usersStr = localStorage.getItem("reshelf_mock_users") || "[]";
+      const users = JSON.parse(usersStr);
+      
+      let match = users.find((u) => u.email === email);
+      if (!match) {
+        match = {
+          email,
+          password: "oauth_mock_pass",
+          full_name: "Google User",
+          phone: "",
+          city: "Bengaluru",
+        };
+        users.push(match);
+        localStorage.setItem("reshelf_mock_users", JSON.stringify(users));
+      }
+
+      const userData = {
+        id: "mock-user-google",
+        email: match.email,
+        full_name: match.full_name,
+        phone: match.phone || "",
+        city: match.city || "Bengaluru",
+        role: "Household",
+      };
+
+      localStorage.setItem("reshelf_session", JSON.stringify(userData));
+      setUser(userData);
+      toast.success("Signed in with Google!");
+      return { user: userData };
+    }
+  };
+
   // 2. Sign Up
   const signUp = async (email, password, metadata) => {
     const fullName = metadata?.full_name || "New User";
@@ -277,7 +319,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateProfile }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateProfile, signInWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

@@ -27,7 +27,7 @@ import { GroqScanner } from "./GroqScanner";
 const categories = ["Food", "Medicine", "Cosmetics", "Household"];
 
 export function ScanProductDialog({ open, onOpenChange, onAdd }) {
-  const [scanType, setScanType] = useState("barcode");
+  const [scanType, setScanType] = useState("vision");
   const [stage, setStage] = useState("idle");
   const [match, setMatch] = useState(null);
   const [quantity, setQuantity] = useState("1 unit");
