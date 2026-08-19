@@ -87,9 +87,7 @@ export const scanProductWithGroq = createServerFn({ method: "POST" })
     }
   });
 
-export const getGroqConfigStatus = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const isConfigured = Boolean(groqApiKey) && groqApiKey !== "gsk_your_groq_api_key_here";
-    return { isConfigured };
-  });
-
+export const getGroqConfigStatus = createServerFn({ method: "GET" }).handler(async () => {
+  const isConfigured = Boolean(groqApiKey) && groqApiKey !== "gsk_your_groq_api_key_here";
+  return { isConfigured };
+});

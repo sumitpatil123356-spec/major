@@ -41,30 +41,57 @@ function Analytics() {
     return acc;
   }, {});
 
-  const dynamicCategoryBreakdown = Object.keys(categoryCounts).map((cat) => ({
+  const activeCategoryBreakdown = Object.keys(categoryCounts).map((cat) => ({
     name: cat,
     value: categoryCounts[cat],
   }));
 
-  // Fallback to static breakdown if no items
-  const activeCategoryBreakdown =
-    dynamicCategoryBreakdown.length > 0
-      ? dynamicCategoryBreakdown
-      : [
-          { name: "Food", value: 58 },
-          { name: "Medicine", value: 22 },
-          { name: "Cosmetics", value: 12 },
-          { name: "Household", value: 8 },
-        ];
+  // Ensure there's some data even if 0, so pie chart doesn't crash, but it should just be empty
+  if (activeCategoryBreakdown.length === 0) {
+    activeCategoryBreakdown.push({ name: "No items", value: 1 });
+  }
 
-  // Calculate dynamic monthly contribution based on current user items
-  const dynamicMonthlyActivity = monthlyActivity.map((act, index) => {
-    // Add small variance based on user's products to show they affect the chart
-    const userDonations = items.filter((p) => p.donatable).length;
-    const factor = Math.min(userDonations, 5);
+  // Calculate dynamic monthly contribution based entirely on user's current items
+  const totalProducts = items.length;
+  const userDonations = items.filter((p) => p.donatable).length;
+  const userWaste = items.filter((p) => {
+    if (!p.expiryDate) return false;
+    return new Date(p.expiryDate) < new Date();
+  }).length;
+
+  const currentMonthIndex = new Date().getMonth();
+  const monthsStr = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const dynamicMonthlyActivity = Array.from({ length: 12 }).map((_, i) => {
+    const factor = (i + 1) / 12; // ascending factor over 12 months
+    const targetMonth = (currentMonthIndex - 11 + i + 12) % 12;
     return {
-      ...act,
-      donations: act.donations + (index === 11 ? factor : Math.round(factor * (index / 12))),
+      month: monthsStr[targetMonth],
+      donations: Math.round(userDonations * Math.pow(factor, 1.5)) || 0,
+      waste: Math.round(userWaste * factor) || 0,
+    };
+  });
+
+  const baseSavings = totalProducts * 380 + userDonations * 420;
+  const dynamicSavingsTrend = Array.from({ length: 12 }).map((_, i) => {
+    const factor = (i + 1) / 12;
+    const targetMonth = (currentMonthIndex - 11 + i + 12) % 12;
+    return {
+      month: monthsStr[targetMonth],
+      saved: Math.round(baseSavings * Math.pow(factor, 2)) || 0,
     };
   });
 
@@ -107,7 +134,7 @@ function Analytics() {
             <CardContent>
               <div className="h-72">
                 <ResponsiveContainer>
-                  <LineChart data={savingsTrend}>
+                  <LineChart data={dynamicSavingsTrend}>
                     <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.93 0.008 160)" />
                     <XAxis dataKey="month" stroke="oklch(0.48 0.02 160)" fontSize={12} />
                     <YAxis stroke="oklch(0.48 0.02 160)" fontSize={12} />

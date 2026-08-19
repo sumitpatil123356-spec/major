@@ -1,5 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Upload, Sparkles, Loader2, CheckCircle2, RefreshCw, Camera, AlertTriangle, AlertCircle } from "lucide-react";
+import {
+  Upload,
+  Sparkles,
+  Loader2,
+  CheckCircle2,
+  RefreshCw,
+  Camera,
+  AlertTriangle,
+  AlertCircle,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -175,7 +184,8 @@ export function GroqScanner({ onAdd, onClose }) {
         <div className="flex items-start gap-2 px-3 py-2 text-xs rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 animate-fade-in">
           <AlertCircle className="h-4 w-4 shrink-0 text-amber-500 mt-0.5" />
           <span>
-            <strong>Demo Mode Active:</strong> <code>GROQ_API_KEY</code> is not configured in your <code>.env</code> file. Scanner will simulate scans with a demo product.
+            <strong>Demo Mode Active:</strong> <code>GROQ_API_KEY</code> is not configured in your{" "}
+            <code>.env</code> file. Scanner will simulate scans with a demo product.
           </span>
         </div>
       )}
@@ -269,7 +279,9 @@ export function GroqScanner({ onAdd, onClose }) {
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary mb-3">
                 <Upload className="h-6 w-6" />
               </div>
-              <p className="mb-2 text-sm font-semibold">Click to upload bill, receipt, or packet image</p>
+              <p className="mb-2 text-sm font-semibold">
+                Click to upload bill, receipt, or packet image
+              </p>
               <p className="text-xs text-muted-foreground">PNG, JPG, or WEBP (max. 4MB)</p>
             </div>
             <input

@@ -37,6 +37,7 @@ create table if not exists public.products (
   notes text,
   owner text not null,
   donatable boolean default false,
+  alert_sent boolean default false,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

@@ -143,7 +143,7 @@ export function AuthProvider({ children }) {
   const signInWithGoogle = async () => {
     if (isSupabaseConfigured) {
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
       });
       if (error) throw error;
       return data;
@@ -152,7 +152,7 @@ export function AuthProvider({ children }) {
       const email = "google_user@example.com";
       const usersStr = localStorage.getItem("reshelf_mock_users") || "[]";
       const users = JSON.parse(usersStr);
-      
+
       let match = users.find((u) => u.email === email);
       if (!match) {
         match = {
@@ -319,7 +319,9 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateProfile, signInWithGoogle }}>
+    <AuthContext.Provider
+      value={{ user, loading, signIn, signUp, signOut, updateProfile, signInWithGoogle }}
+    >
       {children}
     </AuthContext.Provider>
   );

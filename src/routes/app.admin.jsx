@@ -1,5 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Users, Package, Building2, BarChart3, MoreHorizontal, Send, Zap, Loader2 } from "lucide-react";
+import {
+  Users,
+  Package,
+  Building2,
+  BarChart3,
+  MoreHorizontal,
+  Send,
+  Zap,
+  Loader2,
+} from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { KpiCard } from "@/components/kpi-card";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,7 +31,7 @@ export const Route = createFileRoute("/app/admin")({
 function Admin() {
   const { user } = useAuth();
   const [sendingEmail, setSendingEmail] = useState(false);
-  
+
   // Rate limiter state
   const [requests, setRequests] = useState([]);
   const [ticker, setTicker] = useState(0);
@@ -117,7 +126,6 @@ function Admin() {
           <TabsTrigger value="dev-tools">Dev Tools</TabsTrigger>
         </TabsList>
 
-
         <TabsContent value="users" className="mt-4">
           <Card className="border-border/60 overflow-hidden">
             <table className="w-full text-sm">
@@ -209,7 +217,8 @@ function Admin() {
               <div>
                 <h3 className="font-display text-base font-semibold">Email Integration Test</h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Test the Resend email integration. Requires RESEND_API_KEY in .env. Used for budget alert emails.
+                  Test the Resend email integration. Requires RESEND_API_KEY in .env. Used for
+                  budget alert emails.
                 </p>
               </div>
               <Button
@@ -232,9 +241,12 @@ function Admin() {
             <CardContent className="p-6 space-y-4">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <h3 className="font-display text-base font-semibold">Arcjet Rate Limiting Test</h3>
+                  <h3 className="font-display text-base font-semibold">
+                    Arcjet Rate Limiting Test
+                  </h3>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Test Arcjet-style rate limiting. Max 5 clicks per minute. Simulates DDoS protection.
+                    Test Arcjet-style rate limiting. Max 5 clicks per minute. Simulates DDoS
+                    protection.
                   </p>
                 </div>
                 <Badge
@@ -243,8 +255,8 @@ function Admin() {
                     requestsLeft === 0
                       ? "bg-destructive/15 text-destructive-foreground hover:bg-destructive/15 border-transparent shadow-none"
                       : requestsLeft <= 2
-                      ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/15 border-transparent shadow-none"
-                      : "bg-success/15 text-success-foreground hover:bg-success/15 border-transparent shadow-none"
+                        ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/15 border-transparent shadow-none"
+                        : "bg-success/15 text-success-foreground hover:bg-success/15 border-transparent shadow-none",
                   )}
                 >
                   {requestsLeft}/5 requests left
@@ -262,7 +274,6 @@ function Admin() {
           </Card>
         </TabsContent>
       </Tabs>
-
     </AppShell>
   );
 }

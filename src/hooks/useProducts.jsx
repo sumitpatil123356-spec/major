@@ -1,8 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { useAuth } from "./useAuth";
 import { products as initialSeed } from "../lib/mock-data";
 import { toast } from "sonner";
+import { sendEmailWithResend } from "../lib/api/resend.functions";
+import { statusOf } from "../lib/mock-data";
 
 // Helper to map DB snake_case columns to Client camelCase keys
 function mapFromDb(dbProd) {
@@ -17,6 +19,7 @@ function mapFromDb(dbProd) {
     notes: dbProd.notes || "",
     owner: dbProd.owner,
     donatable: dbProd.donatable || false,
+    alertSent: dbProd.alert_sent || false,
     userId: dbProd.user_id,
   };
 }
@@ -33,6 +36,7 @@ function mapToDb(clientProd, userId) {
     notes: clientProd.notes || "",
     owner: clientProd.owner,
     donatable: clientProd.donatable || false,
+    alert_sent: clientProd.alertSent || false,
     user_id: userId,
   };
 }
@@ -115,6 +119,7 @@ export function useProducts() {
         notes: productData.notes || "",
         owner: user.full_name,
         donatable: productData.donatable || false,
+        alertSent: productData.alertSent || false,
         userId: user.id,
       };
 
@@ -140,6 +145,7 @@ export function useProducts() {
       if (updates.notes !== undefined) dbPayload.notes = updates.notes;
       if (updates.owner !== undefined) dbPayload.owner = updates.owner;
       if (updates.donatable !== undefined) dbPayload.donatable = updates.donatable;
+      if (updates.alertSent !== undefined) dbPayload.alert_sent = updates.alertSent;
 
       const { data, error } = await supabase
         .from("products")
@@ -183,6 +189,58 @@ export function useProducts() {
       setProducts(updated);
     }
   };
+
+  const alertedIds = useRef(new Set());
+
+  // Check Expiries and Send Alerts
+  useEffect(() => {
+    if (loading || products.length === 0 || !user) return;
+
+    let hasUpdates = false;
+
+    const checkAlerts = async () => {
+      for (const p of products) {
+        if (!p.alertSent && statusOf(p.expiryDate) !== "safe" && !alertedIds.current.has(p.id)) {
+          // Add to ref immediately to prevent race conditions from re-renders
+          alertedIds.current.add(p.id);
+
+          try {
+            // Trigger UI Alert
+            toast.warning(`Product Alert: ${p.name} is expiring soon or expired!`);
+
+            // Trigger Email Alert
+            if (user.email) {
+              await sendEmailWithResend({
+                data: {
+                  to: user.email,
+                  subject: `Action Required: ${p.name} is expiring!`,
+                  html: `
+                    <div style="font-family: sans-serif; padding: 20px;">
+                      <h2>ReShelf Expiry Alert</h2>
+                      <p>Hello ${user.full_name},</p>
+                      <p>Your product <strong>${p.name}</strong> is expiring soon or has already expired (Expiry: ${p.expiryDate}).</p>
+                      <p>Please check your ReShelf dashboard to update its status or list it for donation.</p>
+                      <p>Stay fresh,<br/>The ReShelf Team</p>
+                    </div>
+                  `,
+                },
+              });
+            }
+
+            // Mark as alerted
+            await updateProduct(p.id, { alertSent: true });
+            hasUpdates = true;
+          } catch (err) {
+            console.error("Failed to send alert for", p.name, err);
+            // If it failed, remove it so we can try again later
+            alertedIds.current.delete(p.id);
+          }
+        }
+      }
+    };
+
+    checkAlerts();
+  }, [products, loading, user]);
 
   return {
     products,
